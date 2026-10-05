@@ -35,7 +35,8 @@ npm start
 ```
 
 ## Decisiones de arquitectura
-_Pendiente_
+### Flutter
+Arquitectura por feature con tres capas. domain contiene entidades puras y contratos (repositorio y datasource), sin depender de Flutter ni de dio. infrastructure contiene los modelos con fromJson, los mappers modelo → entidad y las implementaciones. presentation contiene pantallas, widgets y providers de Riverpod. La UI solo habla con providers, que exponen el repositorio por su interfaz, así que en los tests se sustituye por un fake con overrides.
 
 ## Pendiente / qué mejoraría con más tiempo
 _Pendiente_
