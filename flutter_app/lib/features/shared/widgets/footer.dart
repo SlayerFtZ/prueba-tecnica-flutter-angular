@@ -1,3 +1,5 @@
+// lib/features/shared/widgets/footer.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -36,6 +38,7 @@ class AppFooter extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             '© $currentYear PruebaTest. Todos los derechos reservados.',
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: colorScheme.onPrimary,
               fontSize: 14,
