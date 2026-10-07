@@ -15,6 +15,15 @@ abstract final class ProductMapper {
       brand: model.brand,
       thumbnail: model.thumbnail,
       images: List.unmodifiable(model.images),
+      tags: List.unmodifiable(model.tags),
+      sku: model.sku,
+      weight: model.weight,
+      dimensions: model.dimensions,
+      warrantyInformation: model.warrantyInformation,
+      shippingInformation: model.shippingInformation,
+      returnPolicy: model.returnPolicy,
+      minimumOrderQuantity: model.minimumOrderQuantity,
+      reviews: List.unmodifiable(model.reviews),
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/config/router/app_router.dart';
 import 'package:flutter_app/core/error/failure.dart';
 import 'package:flutter_app/features/home/presentation/widgets/section_error.dart';
 import 'package:flutter_app/features/product/presentation/providers/products_by_category_provider.dart';
 import 'package:flutter_app/features/product/presentation/widgets/products_carousel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductsSection extends ConsumerWidget {
   const ProductsSection({
@@ -42,12 +44,9 @@ class ProductsSection extends ConsumerWidget {
                 )
               : ProductsCarousel(
                   products: items,
-                  onProductTap: (product) {
-                    // TODO: navegar al detalle (siguiente paso)
-                  },
-                  onAddToCart: (product) {
-                    // TODO: agregar al carrito (paso del carrito)
-                  },
+                  onProductTap: (product) =>
+                      context.push(AppRoutes.productPath(product.id)),
+                  onAddToCart: (product) {},
                 ),
         ),
       ],

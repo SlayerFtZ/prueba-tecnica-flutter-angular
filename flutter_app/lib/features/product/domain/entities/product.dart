@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_app/features/product/domain/entities/product_dimensions.dart';
+import 'package:flutter_app/features/product/domain/entities/product_review.dart';
 
 @immutable
 class Product {
@@ -14,6 +16,15 @@ class Product {
     required this.thumbnail,
     required this.images,
     this.brand,
+    this.tags = const [],
+    this.sku = '',
+    this.weight = 0,
+    this.dimensions,
+    this.warrantyInformation = '',
+    this.shippingInformation = '',
+    this.returnPolicy = '',
+    this.minimumOrderQuantity = 1,
+    this.reviews = const [],
   });
 
   final int id;
@@ -27,6 +38,15 @@ class Product {
   final String? brand;
   final String thumbnail;
   final List<String> images;
+  final List<String> tags;
+  final String sku;
+  final double weight;
+  final ProductDimensions? dimensions;
+  final String warrantyInformation;
+  final String shippingInformation;
+  final String returnPolicy;
+  final int minimumOrderQuantity;
+  final List<ProductReview> reviews;
 
   @override
   bool operator ==(Object other) =>

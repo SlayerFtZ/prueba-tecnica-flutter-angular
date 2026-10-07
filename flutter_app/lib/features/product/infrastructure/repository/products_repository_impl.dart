@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_app/config/constants/environment.dart';
 import 'package:flutter_app/core/error/failure.dart';
 import 'package:flutter_app/features/product/domain/datasources/products_datasource.dart';
@@ -10,6 +9,9 @@ import 'package:flutter_app/features/product/domain/repository/products_reposito
 
 class ProductsRepositoryImpl implements ProductsRepository {
   const ProductsRepositoryImpl(this._datasource);
+
+  static const _notFoundStatus = 404;
+  static const _unexpectedFormatMessage = 'Respuesta con formato inesperado.';
 
   final ProductsDatasource _datasource;
 
@@ -57,13 +59,11 @@ class ProductsRepositoryImpl implements ProductsRepository {
     try {
       return await request();
     } on DioException catch (e) {
-      debugPrint(
-        'DioException ${e.type} | ${e.message} | ${e.error} | ${e.requestOptions.uri}',
-      );
       throw _mapError(e);
-    } on TypeError catch (e, s) {
-      debugPrint('TypeError: $e\n$s');
-      throw const UnknownFailure('Respuesta con formato inesperado.');
+    } on TypeError {
+      throw const UnknownFailure(_unexpectedFormatMessage);
+    } on FormatException {
+      throw const UnknownFailure(_unexpectedFormatMessage);
     }
   }
 
@@ -76,7 +76,7 @@ class ProductsRepositoryImpl implements ProductsRepository {
       case DioExceptionType.connectionError:
         return const NetworkFailure();
       case DioExceptionType.badResponse:
-        return e.response?.statusCode == 404
+        return e.response?.statusCode == _notFoundStatus
             ? const NotFoundFailure()
             : const ServerFailure();
       case DioExceptionType.cancel:

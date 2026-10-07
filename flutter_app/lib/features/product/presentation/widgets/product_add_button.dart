@@ -5,7 +5,6 @@ class ProductAddButton extends StatelessWidget {
 
   static const _size = 30.0;
 
-  /// `null` deshabilita el botón (producto agotado).
   final VoidCallback? onPressed;
 
   @override

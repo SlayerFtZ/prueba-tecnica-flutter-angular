@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/features/product/domain/entities/category.dart';
-import 'package:flutter_app/features/product/presentation/widgets/category_icons.dart';
+import 'package:flutter_app/features/product/presentation/widgets/category/category_icons.dart';
 
 const _listPadding = EdgeInsets.symmetric(horizontal: 16, vertical: 4);
 const _itemSpacing = 16.0;

@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/features/cart/presentation/utils/add_to_cart.dart';
 import 'package:flutter_app/features/product/domain/entities/product.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_add_button.dart';
-
 import 'package:flutter_app/features/product/presentation/widgets/product_discount_row.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_image.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_price_column.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_rating_row.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductCardHorizontal extends StatelessWidget {
+class ProductCardHorizontal extends ConsumerWidget {
   const ProductCardHorizontal({
     super.key,
     required this.product,
     required this.onTap,
-    required this.onAddToCart,
+    this.onAddToCart,
   });
 
-  static const height = 140.0;
+  static const height = 160.0;
 
   static const _padding = 7.0;
   static const _imageWidth = 120.0;
@@ -23,10 +24,11 @@ class ProductCardHorizontal extends StatelessWidget {
 
   final Product product;
   final VoidCallback onTap;
-  final VoidCallback onAddToCart;
+
+  final VoidCallback? onAddToCart;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final inStock = product.stock > 0;
@@ -91,7 +93,12 @@ class ProductCardHorizontal extends StatelessWidget {
                         children: [
                           Expanded(child: ProductPriceColumn(product: product)),
                           ProductAddButton(
-                            onPressed: inStock ? onAddToCart : null,
+                            onPressed: inStock
+                                ? () {
+                                    ref.addToCart(context, product);
+                                    onAddToCart?.call();
+                                  }
+                                : null,
                           ),
                         ],
                       ),

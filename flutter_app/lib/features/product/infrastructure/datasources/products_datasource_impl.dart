@@ -22,7 +22,7 @@ class ProductsDatasourceImpl implements ProductsDatasource {
       '/products',
       queryParameters: {'limit': limit, 'skip': skip},
     );
-    return _toPage(response.data!);
+    return _toPage(_bodyOf(response));
   }
 
   @override
@@ -35,20 +35,20 @@ class ProductsDatasourceImpl implements ProductsDatasource {
       '/products/search',
       queryParameters: {'q': query, 'limit': limit, 'skip': skip},
     );
-    return _toPage(response.data!);
+    return _toPage(_bodyOf(response));
   }
 
   @override
   Future<Product> getProductById(int id) async {
     final response = await _dio.get<Map<String, dynamic>>('/products/$id');
-    return ProductMapper.toEntity(ProductModel.fromJson(response.data!));
+    return ProductMapper.toEntity(ProductModel.fromJson(_bodyOf(response)));
   }
 
   @override
   Future<List<Category>> getCategories() async {
     final response = await _dio.get<List<dynamic>>('/products/categories');
     return List.unmodifiable(
-      response.data!.map(
+      _bodyOf(response).map(
         (e) => CategoryMapper.toEntity(
           CategoryModel.fromJson(e as Map<String, dynamic>),
         ),
@@ -66,7 +66,15 @@ class ProductsDatasourceImpl implements ProductsDatasource {
       '/products/category/$slug',
       queryParameters: {'limit': limit, 'skip': skip},
     );
-    return _toPage(response.data!);
+    return _toPage(_bodyOf(response));
+  }
+
+  T _bodyOf<T>(Response<T> response) {
+    final data = response.data;
+    if (data == null) {
+      throw const FormatException('Respuesta vacía del servidor.');
+    }
+    return data;
   }
 
   ProductsPage _toPage(Map<String, dynamic> json) {

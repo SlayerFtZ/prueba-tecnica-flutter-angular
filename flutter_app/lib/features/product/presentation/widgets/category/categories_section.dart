@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/config/router/app_router.dart';
 import 'package:flutter_app/core/error/failure.dart';
 import 'package:flutter_app/features/home/presentation/widgets/section_error.dart';
 import 'package:flutter_app/features/product/presentation/providers/categories_provider.dart';
-import 'package:flutter_app/features/product/presentation/widgets/categories_carousel.dart';
+import 'package:flutter_app/features/product/presentation/widgets/category/categories_carousel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoriesSection extends ConsumerWidget {
   const CategoriesSection({super.key});
@@ -37,9 +39,9 @@ class CategoriesSection extends ConsumerWidget {
                 )
               : CategoriesCarousel(
                   categories: items,
-                  onCategoryTap: (category) {
-                    // TODO: navegar a los productos de la categoría
-                  },
+                  onCategoryTap: (category) => context.push(
+                    AppRoutes.categoryPath(category.slug, category.name),
+                  ),
                 ),
         ),
       ],

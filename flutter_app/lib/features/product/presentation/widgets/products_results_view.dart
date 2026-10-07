@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/config/router/app_router.dart';
 import 'package:flutter_app/features/home/presentation/widgets/section_error.dart';
 import 'package:flutter_app/features/product/domain/entities/product.dart';
-import 'package:flutter_app/features/product/presentation/providers/product_view_mode_provider.dart';
 import 'package:flutter_app/features/product/presentation/providers/products_pagination_provider.dart';
 import 'package:flutter_app/features/product/presentation/widgets/pagination_footer.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_card.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_card_horizontal.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_skeleton_card.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_skeleton_horizontal.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_app/features/shared/widgets/footer.dart';
 
 const _pagePadding = EdgeInsets.fromLTRB(16, 12, 16, 12);
 const _spacing = 12.0;
@@ -18,25 +15,34 @@ const _initialSkeletons = 6;
 const _loadMoreSkeletons = 2;
 const _loadMoreThreshold = 400.0;
 
-class ProductsScreen extends ConsumerStatefulWidget {
-  const ProductsScreen({
+class ProductsResultsView extends StatefulWidget {
+  const ProductsResultsView({
     super.key,
-    required this.categorySlug,
-    required this.title,
+    required this.state,
+    required this.isGrid,
+    required this.onLoadMore,
+    required this.onRefresh,
+    required this.onRetry,
+    required this.onProductTap,
+    required this.onAddToCart,
+    required this.emptyMessage,
   });
 
-  final String categorySlug;
-  final String title;
+  final ProductsPaginationState state;
+  final bool isGrid;
+  final VoidCallback onLoadMore;
+  final Future<void> Function() onRefresh;
+  final VoidCallback onRetry;
+  final ValueChanged<Product> onProductTap;
+  final ValueChanged<Product> onAddToCart;
+  final String emptyMessage;
 
   @override
-  ConsumerState<ProductsScreen> createState() => _ProductsScreenState();
+  State<ProductsResultsView> createState() => _ProductsResultsViewState();
 }
 
-class _ProductsScreenState extends ConsumerState<ProductsScreen> {
+class _ProductsResultsViewState extends State<ProductsResultsView> {
   final _scrollController = ScrollController();
-
-  ProductsPaginationNotifier get _notifier =>
-      ref.read(productsPaginationProvider(widget.categorySlug).notifier);
 
   @override
   void initState() {
@@ -53,54 +59,37 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   }
 
   void _onScroll() {
+    if (!_scrollController.hasClients) return;
     final position = _scrollController.position;
     if (position.pixels >= position.maxScrollExtent - _loadMoreThreshold) {
-      _notifier.loadNextPage();
+      widget.onLoadMore();
     }
   }
 
-  void _onProductTap(Product product) {
-    context.push(AppRoutes.productPath(product.id));
-  }
-
-  void _onAddToCart(Product product) {}
-
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(productsPaginationProvider(widget.categorySlug));
-    final isGrid = ref.watch(productViewModeProvider) == ProductViewMode.grid;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            tooltip: isGrid ? 'Ver como lista' : 'Ver como grilla',
-            icon: Icon(
-              isGrid ? Icons.view_list_rounded : Icons.grid_view_rounded,
-            ),
-            onPressed: ref.read(productViewModeProvider.notifier).toggle,
-          ),
+    return RefreshIndicator(
+      onRefresh: widget.onRefresh,
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          ..._buildSlivers(),
+          const SliverToBoxAdapter(child: AppFooter()),
         ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _notifier.refresh,
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: _buildSlivers(state, isGrid),
-        ),
       ),
     );
   }
 
-  List<Widget> _buildSlivers(ProductsPaginationState state, bool isGrid) {
+  List<Widget> _buildSlivers() {
+    final state = widget.state;
+    final isGrid = widget.isGrid;
+
     if (state.isInitialLoading) {
       return [
         _itemsSliver(
-          isGrid: isGrid,
           itemCount: _initialSkeletons,
-          itemBuilder: (_) => _skeleton(isGrid),
+          itemBuilder: (_) => _skeleton(),
         ),
       ];
     }
@@ -112,7 +101,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
           child: Center(
             child: SectionError(
               message: state.errorMessage!,
-              onRetry: _notifier.retry,
+              onRetry: widget.onRetry,
             ),
           ),
         ),
@@ -120,10 +109,15 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     }
 
     if (state.items.isEmpty) {
-      return const [
+      return [
         SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: Text('No hay productos en esta categoría.')),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(widget.emptyMessage, textAlign: TextAlign.center),
+            ),
+          ),
         ),
       ];
     }
@@ -132,42 +126,40 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
 
     return [
       _itemsSliver(
-        isGrid: isGrid,
         itemCount: state.items.length + extra,
         itemBuilder: (index) {
-          if (index >= state.items.length) return _skeleton(isGrid);
+          if (index >= state.items.length) return _skeleton();
           final product = state.items[index];
           return isGrid
               ? ProductCard(
                   product: product,
-                  onTap: () => _onProductTap(product),
-                  onAddToCart: () => _onAddToCart(product),
+                  onTap: () => widget.onProductTap(product),
+                  onAddToCart: () => widget.onAddToCart(product),
                 )
               : ProductCardHorizontal(
                   product: product,
-                  onTap: () => _onProductTap(product),
-                  onAddToCart: () => _onAddToCart(product),
+                  onTap: () => widget.onProductTap(product),
+                  onAddToCart: () => widget.onAddToCart(product),
                 );
         },
       ),
       SliverToBoxAdapter(
-        child: Footer(state: state, onRetry: _notifier.retry),
+        child: Footer(state: state, onRetry: widget.onRetry),
       ),
     ];
   }
 
-  Widget _skeleton(bool isGrid) => isGrid
+  Widget _skeleton() => widget.isGrid
       ? const ProductCardSkeleton()
       : const ProductCardHorizontalSkeleton();
 
   Widget _itemsSliver({
-    required bool isGrid,
     required int itemCount,
     required Widget Function(int index) itemBuilder,
   }) {
     return SliverPadding(
       padding: _pagePadding,
-      sliver: isGrid
+      sliver: widget.isGrid
           ? SliverGrid.builder(
               gridDelegate: _gridDelegate,
               itemCount: itemCount,

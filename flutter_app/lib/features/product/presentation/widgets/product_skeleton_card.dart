@@ -26,8 +26,7 @@ class ProductCardSkeleton extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(_padding),
-          // Skeletonizer va dentro del Card para que el borde y el fondo
-          // de la tarjeta no se conviertan en "hueso".
+
           child: Skeletonizer(
             enabled: true,
             child: Column(
@@ -45,11 +44,24 @@ class ProductCardSkeleton extends StatelessWidget {
                   height: 12,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                const SizedBox(
+                SizedBox(
                   height: _nameHeight,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 6),
-                    child: Bone.multiText(lines: 2),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Bone(
+                        width: double.infinity,
+                        height: 14,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      const SizedBox(height: 6),
+                      Bone(
+                        width: 110,
+                        height: 14,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ],
                   ),
                 ),
                 Bone(
