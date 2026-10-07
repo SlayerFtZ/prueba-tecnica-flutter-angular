@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_app/core/utils/price_formatter.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
@@ -79,7 +78,7 @@ class CheckoutBarState extends State<CheckoutBar>
               const Spacer(),
               Text('Total ', style: theme.textTheme.bodyMedium),
               Text(
-                formatMoney(widget.total),
+                PriceFormatter.format(widget.total),
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

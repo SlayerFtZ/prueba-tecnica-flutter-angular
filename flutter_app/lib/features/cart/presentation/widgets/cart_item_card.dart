@@ -87,7 +87,7 @@ class CartItemCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        formatMoney(item.subtotal),
+                        PriceFormatter.format(item.subtotal),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
