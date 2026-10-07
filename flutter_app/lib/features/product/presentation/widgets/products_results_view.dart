@@ -14,6 +14,7 @@ const _spacing = 12.0;
 const _initialSkeletons = 6;
 const _loadMoreSkeletons = 2;
 const _loadMoreThreshold = 400.0;
+const _gridMaxItemWidth = 220.0;
 
 class ProductsResultsView extends StatefulWidget {
   const ProductsResultsView({
@@ -100,7 +101,7 @@ class _ProductsResultsViewState extends State<ProductsResultsView> {
           hasScrollBody: false,
           child: Center(
             child: SectionError(
-              message: state.errorMessage!,
+              message: state.errorMessage ?? '',
               onRetry: widget.onRetry,
             ),
           ),
@@ -144,7 +145,7 @@ class _ProductsResultsViewState extends State<ProductsResultsView> {
         },
       ),
       SliverToBoxAdapter(
-        child: Footer(state: state, onRetry: widget.onRetry),
+        child: PaginationFooter(state: state, onRetry: widget.onRetry),
       ),
     ];
   }
@@ -174,7 +175,7 @@ class _ProductsResultsViewState extends State<ProductsResultsView> {
   }
 
   static final _gridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: 220,
+    maxCrossAxisExtent: _gridMaxItemWidth,
     mainAxisExtent: ProductCard.height,
     mainAxisSpacing: _spacing,
     crossAxisSpacing: _spacing,

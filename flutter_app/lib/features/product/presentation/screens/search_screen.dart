@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/config/router/app_router.dart';
+import 'package:flutter_app/features/cart/presentation/providers/cart_provider.dart';
+import 'package:flutter_app/features/cart/presentation/widgets/card_button.dart';
 import 'package:flutter_app/features/product/domain/entities/product.dart';
 import 'package:flutter_app/features/product/presentation/providers/categories_provider.dart';
 import 'package:flutter_app/features/product/presentation/providers/product_view_mode_provider.dart';
@@ -7,6 +9,8 @@ import 'package:flutter_app/features/product/presentation/providers/search_provi
 import 'package:flutter_app/features/product/presentation/widgets/products_results_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+const double _categoryFilterHeight = 56;
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -16,6 +20,8 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
+  static const _addQuantity = 1;
+
   late final TextEditingController _controller;
 
   @override
@@ -35,7 +41,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     ref.read(searchQueryProvider.notifier).clear();
   }
 
-  void _onAddToCart(Product product) {}
+  void _onAddToCart(Product product) {
+    ref.read(cartProvider.notifier).add(product, quantity: _addQuantity);
+  }
 
   void _onProductTap(Product product) {
     FocusScope.of(context).unfocus();
@@ -57,9 +65,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final category = ref.watch(searchCategoryProvider);
     final state = ref.watch(searchProductsProvider);
     final isGrid = ref.watch(productViewModeProvider) == ProductViewMode.grid;
-
-    final queryNotifier = ref.read(searchQueryProvider.notifier);
-    final resultsNotifier = ref.read(searchProductsProvider.notifier);
     final isIdle = query.isEmpty && category == null;
 
     return Scaffold(
@@ -68,8 +73,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           controller: _controller,
           textInputAction: TextInputAction.search,
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
-          onChanged: queryNotifier.onChanged,
-          onSubmitted: queryNotifier.submit,
+          onChanged: (value) =>
+              ref.read(searchQueryProvider.notifier).onChanged(value),
+          onSubmitted: (value) =>
+              ref.read(searchQueryProvider.notifier).submit(value),
           decoration: InputDecoration(
             hintText: 'Buscar productos…',
             border: InputBorder.none,
@@ -91,11 +98,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             icon: Icon(
               isGrid ? Icons.view_list_rounded : Icons.grid_view_rounded,
             ),
-            onPressed: ref.read(productViewModeProvider.notifier).toggle,
+            onPressed: () =>
+                ref.read(productViewModeProvider.notifier).toggle(),
           ),
+          const CartButton(),
         ],
         bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(56),
+          preferredSize: Size.fromHeight(_categoryFilterHeight),
           child: _CategoryFilter(),
         ),
       ),
@@ -104,9 +113,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           : ProductsResultsView(
               state: state,
               isGrid: isGrid,
-              onLoadMore: resultsNotifier.loadNextPage,
-              onRefresh: resultsNotifier.refresh,
-              onRetry: resultsNotifier.retry,
+              onLoadMore: () =>
+                  ref.read(searchProductsProvider.notifier).loadNextPage(),
+              onRefresh: () =>
+                  ref.read(searchProductsProvider.notifier).refresh(),
+              onRetry: () => ref.read(searchProductsProvider.notifier).retry(),
               onProductTap: _onProductTap,
               onAddToCart: _onAddToCart,
               emptyMessage: query.isEmpty
@@ -124,10 +135,9 @@ class _CategoryFilter extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(categoriesProvider);
     final selected = ref.watch(searchCategoryProvider);
-    final notifier = ref.read(searchCategoryProvider.notifier);
 
     return SizedBox(
-      height: 56,
+      height: _categoryFilterHeight,
       child: categories.when(
         loading: () => const SizedBox.shrink(),
         error: (_, _) => const SizedBox.shrink(),
@@ -141,7 +151,9 @@ class _CategoryFilter extends ConsumerWidget {
             return FilterChip(
               label: Text(category.name),
               selected: category.slug == selected,
-              onSelected: (_) => notifier.toggle(category.slug),
+              onSelected: (_) => ref
+                  .read(searchCategoryProvider.notifier)
+                  .toggle(category.slug),
             );
           },
         ),

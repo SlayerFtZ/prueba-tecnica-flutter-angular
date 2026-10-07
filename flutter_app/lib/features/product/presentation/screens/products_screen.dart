@@ -1,190 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/config/router/app_router.dart';
-import 'package:flutter_app/features/home/presentation/widgets/section_error.dart';
-import 'package:flutter_app/features/product/domain/entities/product.dart';
+import 'package:flutter_app/features/cart/presentation/providers/cart_provider.dart';
+import 'package:flutter_app/features/cart/presentation/widgets/card_button.dart';
 import 'package:flutter_app/features/product/presentation/providers/product_view_mode_provider.dart';
 import 'package:flutter_app/features/product/presentation/providers/products_pagination_provider.dart';
-import 'package:flutter_app/features/product/presentation/widgets/pagination_footer.dart';
-import 'package:flutter_app/features/product/presentation/widgets/product_card.dart';
-import 'package:flutter_app/features/product/presentation/widgets/product_card_horizontal.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_app/features/product/presentation/widgets/product_skeleton_card.dart';
-import 'package:flutter_app/features/product/presentation/widgets/product_skeleton_horizontal.dart';
+import 'package:flutter_app/features/product/presentation/widgets/products_results_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-const _pagePadding = EdgeInsets.fromLTRB(16, 12, 16, 12);
-const _spacing = 12.0;
-const _initialSkeletons = 6;
-const _loadMoreSkeletons = 2;
-const _loadMoreThreshold = 400.0;
-
-class ProductsScreen extends ConsumerStatefulWidget {
+class ProductsScreen extends ConsumerWidget {
   const ProductsScreen({
     super.key,
     required this.categorySlug,
     required this.title,
   });
 
+  static const _addQuantity = 1;
+
   final String categorySlug;
   final String title;
 
   @override
-  ConsumerState<ProductsScreen> createState() => _ProductsScreenState();
-}
-
-class _ProductsScreenState extends ConsumerState<ProductsScreen> {
-  final _scrollController = ScrollController();
-
-  ProductsPaginationNotifier get _notifier =>
-      ref.read(productsPaginationProvider(widget.categorySlug).notifier);
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final position = _scrollController.position;
-    if (position.pixels >= position.maxScrollExtent - _loadMoreThreshold) {
-      _notifier.loadNextPage();
-    }
-  }
-
-  void _onProductTap(Product product) {
-    context.push(AppRoutes.productPath(product.id));
-  }
-
-  void _onAddToCart(Product product) {}
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(productsPaginationProvider(widget.categorySlug));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = productsPaginationProvider(categorySlug);
+    final state = ref.watch(provider);
     final isGrid = ref.watch(productViewModeProvider) == ProductViewMode.grid;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
         actions: [
           IconButton(
             tooltip: isGrid ? 'Ver como lista' : 'Ver como grilla',
             icon: Icon(
               isGrid ? Icons.view_list_rounded : Icons.grid_view_rounded,
             ),
-            onPressed: ref.read(productViewModeProvider.notifier).toggle,
+            onPressed: () =>
+                ref.read(productViewModeProvider.notifier).toggle(),
           ),
+          const CartButton(),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _notifier.refresh,
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: _buildSlivers(state, isGrid),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildSlivers(ProductsPaginationState state, bool isGrid) {
-    if (state.isInitialLoading) {
-      return [
-        _itemsSliver(
-          isGrid: isGrid,
-          itemCount: _initialSkeletons,
-          itemBuilder: (_) => _skeleton(isGrid),
-        ),
-      ];
-    }
-
-    if (state.hasInitialError) {
-      return [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Center(
-            child: SectionError(
-              message: state.errorMessage!,
-              onRetry: _notifier.retry,
-            ),
-          ),
-        ),
-      ];
-    }
-
-    if (state.items.isEmpty) {
-      return const [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Center(child: Text('No hay productos en esta categoría.')),
-        ),
-      ];
-    }
-
-    final extra = state.isLoading ? _loadMoreSkeletons : 0;
-
-    return [
-      _itemsSliver(
+      body: ProductsResultsView(
+        state: state,
         isGrid: isGrid,
-        itemCount: state.items.length + extra,
-        itemBuilder: (index) {
-          if (index >= state.items.length) return _skeleton(isGrid);
-          final product = state.items[index];
-          return isGrid
-              ? ProductCard(
-                  product: product,
-                  onTap: () => _onProductTap(product),
-                  onAddToCart: () => _onAddToCart(product),
-                )
-              : ProductCardHorizontal(
-                  product: product,
-                  onTap: () => _onProductTap(product),
-                  onAddToCart: () => _onAddToCart(product),
-                );
-        },
+        onLoadMore: () => ref.read(provider.notifier).loadNextPage(),
+        onRefresh: () => ref.read(provider.notifier).refresh(),
+        onRetry: () => ref.read(provider.notifier).retry(),
+        onProductTap: (product) =>
+            context.push(AppRoutes.productPath(product.id)),
+        onAddToCart: (product) => ref
+            .read(cartProvider.notifier)
+            .add(product, quantity: _addQuantity),
+        emptyMessage: 'No hay productos en esta categoría.',
       ),
-      SliverToBoxAdapter(
-        child: Footer(state: state, onRetry: _notifier.retry),
-      ),
-    ];
-  }
-
-  Widget _skeleton(bool isGrid) => isGrid
-      ? const ProductCardSkeleton()
-      : const ProductCardHorizontalSkeleton();
-
-  Widget _itemsSliver({
-    required bool isGrid,
-    required int itemCount,
-    required Widget Function(int index) itemBuilder,
-  }) {
-    return SliverPadding(
-      padding: _pagePadding,
-      sliver: isGrid
-          ? SliverGrid.builder(
-              gridDelegate: _gridDelegate,
-              itemCount: itemCount,
-              itemBuilder: (_, index) => itemBuilder(index),
-            )
-          : SliverList.separated(
-              itemCount: itemCount,
-              separatorBuilder: (_, _) => const SizedBox(height: _spacing),
-              itemBuilder: (_, index) => itemBuilder(index),
-            ),
     );
   }
-
-  static final _gridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: 220,
-    mainAxisExtent: ProductCard.height,
-    mainAxisSpacing: _spacing,
-    crossAxisSpacing: _spacing,
-  );
 }

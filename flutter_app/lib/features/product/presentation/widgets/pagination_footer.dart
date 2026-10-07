@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/features/product/presentation/providers/products_pagination_provider.dart';
 
-class Footer extends StatelessWidget {
-  const Footer({super.key, required this.state, required this.onRetry});
+class PaginationFooter extends StatelessWidget {
+  const PaginationFooter({
+    super.key,
+    required this.state,
+    required this.onRetry,
+  });
 
   final ProductsPaginationState state;
   final VoidCallback onRetry;
@@ -11,13 +15,15 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = theme.colorScheme.onSurfaceVariant;
-    if (state.errorMessage != null) {
+    final errorMessage = state.errorMessage;
+
+    if (errorMessage != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Column(
           children: [
             Text(
-              state.errorMessage!,
+              errorMessage,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(color: color),
             ),
