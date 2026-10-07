@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/config/router/app_router.dart';
 import 'package:flutter_app/features/cart/presentation/providers/cart_provider.dart';
-import 'package:flutter_app/features/cart/presentation/widgets/card_button.dart';
+import 'package:flutter_app/features/cart/presentation/widgets/cart_button.dart';
 import 'package:flutter_app/features/product/presentation/providers/product_view_mode_provider.dart';
 import 'package:flutter_app/features/product/presentation/providers/products_pagination_provider.dart';
 import 'package:flutter_app/features/product/presentation/widgets/products_results_view.dart';

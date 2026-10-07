@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/error/failure.dart';
-import 'package:flutter_app/features/cart/presentation/widgets/card_button.dart';
+
+import 'package:flutter_app/features/cart/presentation/widgets/cart_button.dart';
 import 'package:flutter_app/features/home/presentation/widgets/section_error.dart';
 import 'package:flutter_app/features/product/domain/entities/product.dart';
 import 'package:flutter_app/features/product/presentation/providers/product_detail_provider.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/features/cart/presentation/widgets/card_button.dart';
+import 'package:flutter_app/features/cart/presentation/widgets/cart_button.dart';
 import 'package:flutter_app/features/product/presentation/widgets/category/categories_section.dart';
 import 'package:flutter_app/features/product/presentation/widgets/products_section.dart';
 import 'package:flutter_app/features/shared/widgets/footer.dart';

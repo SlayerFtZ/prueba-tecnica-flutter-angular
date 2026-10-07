@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/core/utils/price_formatter.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
+const _pulseDuration = Duration(milliseconds: 1200);
+
 class CheckoutBar extends StatefulWidget {
   const CheckoutBar({
     super.key,
@@ -27,10 +29,8 @@ class CheckoutBarState extends State<CheckoutBar>
   @override
   void initState() {
     super.initState();
-    _wave = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
+    _wave = AnimationController(vsync: this, duration: _pulseDuration)
+      ..repeat();
   }
 
   @override

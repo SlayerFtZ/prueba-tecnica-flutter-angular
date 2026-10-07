@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/config/constants/app_durations.dart';
 import 'package:flutter_app/features/product/presentation/widgets/product_badge.dart';
 
 const _galleryHeight = 320.0;
@@ -28,7 +29,7 @@ class ImageGalleryState extends State<ImageGallery> {
   void _goTo(int index) {
     _controller.animateToPage(
       index,
-      duration: const Duration(milliseconds: 250),
+      duration: AppDurations.medium,
       curve: Curves.easeOut,
     );
   }
@@ -123,7 +124,7 @@ class ImageGalleryState extends State<ImageGallery> {
                 return GestureDetector(
                   onTap: () => _goTo(index),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: AppDurations.short,
                     width: 52,
                     height: 52,
                     padding: const EdgeInsets.all(4),

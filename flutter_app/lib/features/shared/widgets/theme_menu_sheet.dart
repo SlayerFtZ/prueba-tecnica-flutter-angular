@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/config/constants/app_durations.dart';
 import 'package:flutter_app/config/theme/provider/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,7 +38,7 @@ class ThemeMenuSheet extends ConsumerWidget {
                     : 'Cambiar a modo oscuro',
                 onPressed: notifier.toggleTheme,
                 icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
+                  duration: AppDurations.medium,
                   transitionBuilder: (child, animation) => RotationTransition(
                     turns: Tween<double>(
                       begin: 0.75,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/features/cart/presentation/widgets/delete_background.dart';
 
+const _hintDuration = Duration(milliseconds: 1800);
+
 class SwipeHint extends StatefulWidget {
   const SwipeHint({super.key, required this.child});
 
@@ -21,10 +23,7 @@ class SwipeHintState extends State<SwipeHint>
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    );
+    _controller = AnimationController(vsync: this, duration: _hintDuration);
 
     _offset = TweenSequence<double>([
       TweenSequenceItem(tween: ConstantTween<double>(0), weight: 5),
