@@ -7,5 +7,3 @@ abstract final class PriceFormatter {
     return '\$$integer.${parts[1]}';
   }
 }
-
-String formatMoney(double value) => '\$${value.toStringAsFixed(2)}';
