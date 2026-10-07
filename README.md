@@ -40,8 +40,29 @@ npm start
 ```
 
 ## Decisiones de arquitectura
+
 ### Flutter
-Arquitectura por feature con tres capas. domain contiene entidades puras y contratos (repositorio y datasource), sin depender de Flutter ni de dio. infrastructure contiene los modelos con fromJson, los mappers modelo → entidad y las implementaciones. presentation contiene pantallas, widgets y providers de Riverpod. La UI solo habla con providers, que exponen el repositorio por su interfaz, así que en los tests se sustituye por un fake con overrides.
+Arquitectura **feature-first** con tres capas por feature (`product`, `cart`, `home`), más `config`, `core` y `shared` para lo transversal.
+- **domain:** entidades inmutables y contratos (`ProductsRepository`, `ProductsDatasource`, `CartRepository`). No conoce `dio`, `shared_preferences` ni widgets; solo usa `foundation` de Flutter para `@immutable`.
+- **infrastructure:** modelos con `fromJson`, mappers modelo → entidad e implementaciones de datasource y repositorio (`dio` para el catálogo, `shared_preferences` para el carrito).
+- **presentation:** pantallas, widgets y providers de Riverpod. La UI nunca habla con la infraestructura: solo lee providers.
+
+**Inyección de dependencias con Riverpod.** Las dependencias se exponen con `@riverpod` (`riverpod_generator`) siguiendo la cadena `dio → datasource → repository`, y cada eslabón se publica por su **interfaz**, no por su implementación. Por eso en los tests se reemplaza el repositorio con un fake mediante `overrides`, sin red ni mocks de `dio`.
+
+**Estado.** Notifiers para estado con lógica (búsqueda con debounce y paginación, carrito persistido) y providers `family` para lo que depende de un parámetro (detalle por `id`, cantidad por producto). Los providers de larga vida (`dio`, repositorios, carrito) usan `keepAlive`; el resto se libera automáticamente.
+
+**Errores.** Los fallos se modelan con tipos `Failure` en `core/error`, y la UI muestra su mensaje sin depender de excepciones concretas de la capa de datos.
 
 ## Pendiente / qué mejoraría con más tiempo
-_Pendiente_
+
+# Flutter
+Huviera implementado auth con zitadel para gestion de acceso de seguridad
+Implementacion con stripe para pasarela de pago simulado coon tarjetas de pruebas (444 444 444 444)
+Agregue la dependecia y empeze la estrcutra para implementar traduccion de idioma utilziando gettext
+Mejora de uix para la carga de las imagenes como por ejemplo ponerles un spinner de carga y el cache 
+Crear el splash principa con logo y nombre de la aplicacion , y su launcher
+Mejorar el thema oscuro
+Implementar otra libreria de mensajes de notifiacion y no usas el snackbar
+Implementar lottie para animaciones
+Implementar la funcionalidad de compartir contenido por redes o whatapp
+# Angular
