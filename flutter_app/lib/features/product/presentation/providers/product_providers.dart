@@ -4,9 +4,12 @@ import 'package:flutter_app/features/product/domain/datasources/products_datasou
 import 'package:flutter_app/features/product/domain/repository/products_repository.dart';
 import 'package:flutter_app/features/product/infrastructure/datasources/products_datasource_impl.dart';
 import 'package:flutter_app/features/product/infrastructure/repository/products_repository_impl.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final dioProvider = Provider<Dio>((ref) {
+part 'product_providers.g.dart';
+
+@Riverpod(keepAlive: true)
+Dio dio(Ref ref) {
   return Dio(
     BaseOptions(
       baseUrl: Environment.baseApiUrl,
@@ -14,12 +17,14 @@ final dioProvider = Provider<Dio>((ref) {
       receiveTimeout: Environment.receiveTimeout,
     ),
   );
-});
+}
 
-final productsDatasourceProvider = Provider<ProductsDatasource>((ref) {
+@Riverpod(keepAlive: true)
+ProductsDatasource productsDatasource(Ref ref) {
   return ProductsDatasourceImpl(ref.watch(dioProvider));
-});
+}
 
-final productsRepositoryProvider = Provider<ProductsRepository>((ref) {
+@Riverpod(keepAlive: true)
+ProductsRepository productsRepository(Ref ref) {
   return ProductsRepositoryImpl(ref.watch(productsDatasourceProvider));
-});
+}

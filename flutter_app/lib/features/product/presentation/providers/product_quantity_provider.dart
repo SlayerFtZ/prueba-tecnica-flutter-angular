@@ -1,12 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class ProductQuantityNotifier extends Notifier<int> {
-  ProductQuantityNotifier(this.productId);
+part 'product_quantity_provider.g.dart';
 
-  final int productId;
-
+@riverpod
+class ProductQuantityNotifier extends _$ProductQuantityNotifier {
   @override
-  int build() => 1;
+  int build(int productId) => 1;
 
   void increase(int max) {
     if (state < max) state++;
@@ -16,6 +15,3 @@ class ProductQuantityNotifier extends Notifier<int> {
     if (state > 1) state--;
   }
 }
-
-final productQuantityProvider = NotifierProvider.autoDispose
-    .family<ProductQuantityNotifier, int, int>(ProductQuantityNotifier.new);

@@ -1,11 +1,10 @@
 import 'package:flutter_app/features/product/domain/entities/product.dart';
 import 'package:flutter_app/features/product/presentation/providers/product_providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+part 'product_detail_provider.g.dart';
 
-final productDetailProvider = FutureProvider.autoDispose.family<Product, int>((
-  ref,
-  id,
-) {
+@riverpod
+Future<Product> productDetail(Ref ref, int id) {
   return ref.watch(productsRepositoryProvider).getProductById(id);
-});
+}

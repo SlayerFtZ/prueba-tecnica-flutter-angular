@@ -6,9 +6,12 @@ import 'package:flutter_app/features/product/domain/entities/product.dart';
 import 'package:flutter_app/features/product/domain/entities/products_page.dart';
 import 'package:flutter_app/features/product/presentation/providers/product_providers.dart';
 import 'package:flutter_app/features/product/presentation/providers/products_pagination_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class SearchQueryNotifier extends Notifier<String> {
+part 'search_providers.g.dart';
+
+@riverpod
+class SearchQueryNotifier extends _$SearchQueryNotifier {
   static const debounce = Duration(milliseconds: 400);
 
   Timer? _timer;
@@ -37,24 +40,16 @@ class SearchQueryNotifier extends Notifier<String> {
   }
 }
 
-final searchQueryProvider =
-    NotifierProvider.autoDispose<SearchQueryNotifier, String>(
-      SearchQueryNotifier.new,
-    );
-
-class SearchCategoryNotifier extends Notifier<String?> {
+@riverpod
+class SearchCategoryNotifier extends _$SearchCategoryNotifier {
   @override
   String? build() => null;
 
   void toggle(String slug) => state = state == slug ? null : slug;
 }
 
-final searchCategoryProvider =
-    NotifierProvider.autoDispose<SearchCategoryNotifier, String?>(
-      SearchCategoryNotifier.new,
-    );
-
-class SearchProductsNotifier extends Notifier<ProductsPaginationState> {
+@riverpod
+class SearchProductsNotifier extends _$SearchProductsNotifier {
   static const _noCriteriaMessage = 'No hay búsqueda ni categoría activa.';
 
   int _generation = 0;
@@ -160,9 +155,3 @@ class SearchProductsNotifier extends Notifier<ProductsPaginationState> {
     }
   }
 }
-
-final searchProductsProvider =
-    NotifierProvider.autoDispose<
-      SearchProductsNotifier,
-      ProductsPaginationState
-    >(SearchProductsNotifier.new);

@@ -1,5 +1,10 @@
+
 # Prueba técnica — Flutter (Riverpod) + Angular
 
+![CI](https://github.com/SlayerFtZ/prueba-tecnica-flutter-angular/actions/workflows/ci.yml/badge.svg)
+
+- [Flutter app](./flutter_app)
+- [Angular app](./angular_app)
 ## Estructura
 - `flutter_app/`: app "Mini Catálogo" (Flutter + Riverpod).
 - `angular_app/`: módulo "Panel de pedidos" (Angular).

@@ -5,16 +5,20 @@ import 'package:flutter_app/features/cart/infrastructure/infrastructure.dart';
 import 'package:flutter_app/features/product/domain/entities/product.dart';
 import 'package:flutter_app/features/shared/provider/shared_preference_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final cartRepositoryProvider = Provider<CartRepository>(
-  (ref) => CartRepositoryImpl(
-    CartDatasourceImpl(ref.watch(sharedPreferencesProvider)),
-  ),
+part 'cart_provider.g.dart';
+
+@Riverpod(keepAlive: true)
+CartRepository cartRepository(Ref ref) => CartRepositoryImpl(
+  CartDatasourceImpl(ref.watch(sharedPreferencesProvider)),
 );
 
-class CartNotifier extends Notifier<Cart> {
+@Riverpod(keepAlive: true)
+class CartNotifier extends _$CartNotifier {
   @override
   Cart build() => ref.watch(cartRepositoryProvider).load();
+
   void add(Product product, {int quantity = 1}) => addItem(
     CartItem(
       productId: product.id,
@@ -76,12 +80,8 @@ class CartNotifier extends Notifier<Cart> {
   }
 }
 
-final cartProvider = NotifierProvider<CartNotifier, Cart>(CartNotifier.new);
+@Riverpod(keepAlive: true)
+int cartCount(Ref ref) => ref.watch(cartProvider.select((c) => c.itemCount));
 
-final cartCountProvider = Provider<int>(
-  (ref) => ref.watch(cartProvider.select((c) => c.itemCount)),
-);
-
-final cartTotalProvider = Provider<double>(
-  (ref) => ref.watch(cartProvider.select((c) => c.total)),
-);
+@Riverpod(keepAlive: true)
+double cartTotal(Ref ref) => ref.watch(cartProvider.select((c) => c.total));
