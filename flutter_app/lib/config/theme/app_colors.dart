@@ -73,18 +73,6 @@ class AppColors {
   // ============================================================
   // TEXTOS
   // ============================================================
-  //
-  // Estos colores se mantienen por compatibilidad con código
-  // existente.
-  //
-  // Para código nuevo se recomienda utilizar:
-  //
-  // Theme.of(context).colorScheme.onSurface
-  // Theme.of(context).colorScheme.onSurfaceVariant
-  //
-  // Esto permite que el texto se adapte automáticamente
-  // al tema claro u oscuro.
-  // ============================================================
 
   static const textDark = Colors.black87;
   static const textLight = Color(0xFF757575);

@@ -1,6 +1,7 @@
 sealed class Failure implements Exception {
   const Failure(this.message);
   final String message;
+
   @override
   String toString() => message;
 }
@@ -15,10 +16,6 @@ class ServerFailure extends Failure {
 
 class NotFoundFailure extends Failure {
   const NotFoundFailure([super.message = 'Recurso no encontrado']);
-}
-
-class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure([super.message = 'No autorizado']);
 }
 
 class UnknownFailure extends Failure {
