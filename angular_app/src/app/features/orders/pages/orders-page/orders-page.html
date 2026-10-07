@@ -1,1 +1,25 @@
-<p>orders-page works!</p>
+<header class="page-header">
+  <h1>Pedidos</h1>
+  @if (state().status === 'success') {
+    <span class="badge">{{ filtered().length }} resultados</span>
+  }
+</header>
+
+<app-order-filters (filtersChange)="filters.set($event)" />
+
+@let s = state();
+@if (s.status === 'loading') {
+  <app-loading-state message="Cargando pedidos…" />
+} @else if (s.status === 'error') {
+  <app-error-state [message]="s.message" (retry)="reload()" />
+} @else {
+  <p class="summary">Mostrando {{ filtered().length }} de {{ s.data.length }} pedidos</p>
+
+  <div class="grid">
+    @for (order of filtered(); track order.id) {
+      <app-order-card [order]="order" (viewDetail)="goToDetail($event)" />
+    } @empty {
+      <p class="empty">No hay pedidos que coincidan con el filtro.</p>
+    }
+  </div>
+}

@@ -1,0 +1,14 @@
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px #0001;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+h3 {
+  margin: 0;
+}

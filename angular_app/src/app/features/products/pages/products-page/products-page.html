@@ -1,1 +1,18 @@
-<p>products-page works!</p>
+<h1>Productos</h1>
+<input type="search" placeholder="Buscar por nombre o categoría…" [formControl]="search" />
+
+@let s = state();
+@if (s.status === 'loading') {
+  <app-loading-state message="Cargando productos…" />
+} @else if (s.status === 'error') {
+  <app-error-state [message]="s.message" (retry)="reload()" />
+} @else {
+  <p>{{ filtered().length }} de {{ s.data.length }} productos</p>
+  <div class="grid">
+    @for (p of filtered(); track p.id) {
+      <app-product-card [product]="p" (viewDetail)="showDetail($event)" />
+    } @empty {
+      <p>Sin resultados.</p>
+    }
+  </div>
+}

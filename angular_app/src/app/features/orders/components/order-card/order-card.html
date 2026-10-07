@@ -1,1 +1,13 @@
-<p>order-card works!</p>
+<article class="card">
+  <header>
+    <h3>Pedido #{{ order().id }}</h3>
+    <span>Usuario {{ order().userId }}</span>
+  </header>
+  <p>{{ order().totalProducts }} productos · {{ order().totalQuantity }} unidades</p>
+  <p>
+    <s>{{ order().total | currency }}</s>
+    <strong>{{ order().discountedTotal | currency }}</strong>
+    <small>(-{{ order().total | discountPercent: order().discountedTotal }})</small>
+  </p>
+  <button type="button" (click)="viewDetail.emit(order().id)">Ver detalle</button>
+</article>

@@ -1,1 +1,25 @@
-<p>order-detail works!</p>
+<a class="back" routerLink="/orders">← Volver a pedidos</a>
+
+@let s = state();
+@if (s.status === 'loading') {
+  <app-loading-state message="Cargando pedido…" />
+} @else if (s.status === 'error') {
+  <p class="error" role="alert">{{ s.message }}</p>
+} @else {
+  <header class="head">
+    <h1>Pedido #{{ s.data.id }}</h1>
+    <span>Usuario {{ s.data.userId }}</span>
+  </header>
+
+  <p class="meta">
+    {{ s.data.totalProducts }} productos · {{ s.data.totalQuantity }} unidades
+  </p>
+
+  <app-order-items [products]="s.data.products" />
+
+  <section class="totals">
+    <p>Subtotal: <s>{{ s.data.total | currency }}</s></p>
+    <p>Descuento: {{ s.data.total | discountPercent: s.data.discountedTotal }}</p>
+    <p class="final">Total: <strong>{{ s.data.discountedTotal | currency }}</strong></p>
+  </section>
+}

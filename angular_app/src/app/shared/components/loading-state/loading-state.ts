@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
-  imports: [],
   selector: 'app-loading-state',
-  styleUrl: './loading-state.css',
-  templateUrl: './loading-state.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<p class="loading" aria-busy="true">{{ message() }}</p>`,
+  styles: `.loading { padding: 2rem; text-align: center; color: #6b7280; }`,
 })
-export class LoadingState {}
+export class LoadingStateComponent {
+  readonly message = input('Cargando…');
+}

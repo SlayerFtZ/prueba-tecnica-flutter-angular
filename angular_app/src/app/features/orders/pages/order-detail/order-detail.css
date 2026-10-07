@@ -1,0 +1,30 @@
+.back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #2563eb;
+  text-decoration: none;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+.head h1 {
+  margin: 0;
+}
+.meta {
+  color: #6b7280;
+}
+.totals {
+  margin-top: 1rem;
+  text-align: right;
+}
+.totals p {
+  margin: 0.25rem 0;
+}
+.final {
+  font-size: 1.25rem;
+}
+.error {
+  color: #b91c1c;
+}

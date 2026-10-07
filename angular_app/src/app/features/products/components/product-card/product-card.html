@@ -1,1 +1,10 @@
-<p>product-card works!</p>
+<article class="card">
+  <img [src]="product().thumbnail" [alt]="product().title" width="120" height="120" />
+  <h3>{{ product().title }}</h3>
+  <small>{{ product().category }}</small>
+  <p>
+    <strong>{{ product().price | currency }}</strong>
+    · Stock: {{ product().stock }} · ⭐ {{ product().rating }}
+  </p>
+  <button type="button" (click)="viewDetail.emit(product())">Ver detalle</button>
+</article>

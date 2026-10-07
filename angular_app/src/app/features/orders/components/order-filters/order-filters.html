@@ -1,1 +1,11 @@
-<p>order-filters works!</p>
+<form [formGroup]="form" class="filters">
+  <label>
+    Total mínimo
+    <input type="number" min="0" formControlName="minTotal" />
+  </label>
+  <label>
+    Usuario (ID)
+    <input type="number" min="1" formControlName="userId" />
+  </label>
+  <button type="button" (click)="clear()">Limpiar</button>
+</form>

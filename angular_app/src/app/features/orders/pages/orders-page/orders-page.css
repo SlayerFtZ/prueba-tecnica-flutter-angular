@@ -1,0 +1,31 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.page-header h1 {
+  margin: 0;
+}
+.badge {
+  background: #e5e7eb;
+  color: #374151;
+  border-radius: 999px;
+  padding: 0.15rem 0.75rem;
+  font-size: 0.85rem;
+}
+.summary {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #6b7280;
+  padding: 2rem;
+}
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
