@@ -1,40 +1,45 @@
 # angular_app
 
-Angular application for managing orders, products and dashboard information.
+Angular admin-style **orders panel** that lists carts from the
+[DummyJSON](https://dummyjson.com/docs/carts) API, with a reactive filter, a
+lazy-loaded detail page, and extra dashboard and products pages.
 
 ![CI](https://github.com/SlayerFtZ/prueba-tecnica-flutter-angular/actions/workflows/angular-ci.yml/badge.svg)
 
 ## Features
 
-* Dashboard with order summary information
-* Browse products
-* Browse orders
-* Order filtering
-* Order detail view
-* Order items visualization
-* Unit tests for pages, components and services
+* Orders list rendered as cards (`GET /carts`)
+* Reactive filter by **minimum total** and **user ID**
+* Loading, error (with retry) and empty states
+* Order detail at `/orders/:id` (lazy loaded)
+* Custom `discountPercent` pipe
+* Dashboard with order summary and a products list (extras)
 * Environment configuration through `.env`
+* 17 unit tests across pages, components, services and the pipe
 
 ## Tech stack
 
-* **Framework:** Angular 22
-* **Language:** TypeScript
-* **Styling:** CSS
-* **Testing:** Vitest
-* **UI components:** SweetAlert2
-* **Build tooling:** Angular CLI
+* **Framework:** Angular 22 (standalone components, zoneless, built-in control flow)
+* **Language:** TypeScript 6 with `strict` and `strictTemplates`
+* **State:** signals (`signal`, `computed`, `toSignal`) and RxJS
+* **HTTP:** `HttpClient`, only inside services
+* **Forms:** typed reactive forms
+* **Styling:** Tailwind CSS 4
+* **Testing:** Vitest, jsdom and `HttpTestingController`
 * **Environment:** `.env` with a generated TypeScript configuration file
 * **CI:** GitHub Actions
 
 ## Architecture
 
-Feature-first architecture. Each feature groups its pages, components, models, services and routes:
+Feature-first architecture. Each feature groups its pages, components, models,
+services and routes:
 
 ```text
 src/app/
-
 ├── core/
-│   └── config/              # environment and application configuration
+│   ├── config/              # environment and application configuration
+│   ├── layout/              # shell: navbar, sidebar, footer
+│   └── services/            # app-wide services
 │
 ├── features/
 │   ├── dashboard/
@@ -42,118 +47,155 @@ src/app/
 │   │   └── dashboard-routes.ts
 │   │
 │   ├── orders/
-│   │   ├── components/      # order cards, filters and items
-│   │   ├── models/          # order models
-│   │   ├── pages/           # orders list and order detail
-│   │   ├── services/        # orders API service
+│   │   ├── components/      # order card, filters and items (presentational)
+│   │   ├── models/          # Order, OrderProduct, OrdersResponse
+│   │   ├── pages/           # orders list (container) and order detail
+│   │   ├── services/        # OrdersService (only place that uses HttpClient)
 │   │   └── orders.routes.ts
 │   │
 │   └── products/
-│       ├── components/      # product components
-│       ├── models/          # product models
-│       ├── pages/           # products list
-│       ├── services/        # products API service
+│       ├── components/
+│       ├── models/
+│       ├── pages/
+│       ├── services/
 │       └── products-routes.ts
 │
-└── shared/                  # shared application components
+└── shared/                  # LoadState, toLoadState, pipe, loading/error components
 ```
 
-Each feature is organized according to its responsibility:
+Each feature is organized by responsibility:
 
-* **pages:** main views of each feature, such as the dashboard, orders list, order detail and products list.
-* **components:** reusable UI components specific to a feature.
-* **models:** TypeScript models used to represent application data.
-* **services:** services responsible for communication with the API and feature-related data logic.
-* **routes:** route definitions for each feature.
-* **spec.ts:** unit tests associated with pages, components and services.
+* **pages:** main views. The orders list is the container: it owns data and filter state.
+* **components:** presentational pieces specific to a feature.
+* **models:** TypeScript interfaces that type the API data. There is no `any`.
+* **services:** the only layer that talks to the API.
+* **routes:** each feature defines its own routes and is lazy loaded.
+* **spec.ts:** unit tests next to the code they cover.
 
-This structure keeps each feature encapsulated and makes the application easier to maintain and extend as it grows.
+### Design decisions
+
+* **Logic vs presentation.** `OrdersService` (`providedIn: 'root'`) wraps
+  `HttpClient` and returns typed observables. `OrdersPageComponent` (container)
+  consumes it. `OrderCardComponent` (presentational) receives data with
+  `input.required()`, emits `viewDetail` with `output()`, and injects nothing.
+* **Loading and error states.** `LoadState<T>` is a discriminated union
+  (`loading | error | success`) and `toLoadState()` is an RxJS operator that
+  maps any request into it, so every page handles the three states the same way.
+* **No memory leaks.** Production code has no manual `subscribe()`. Streams are
+  consumed with `toSignal`, `toObservable` and `outputFromObservable`, which are
+  cleaned up with the component.
+* **Reactive filter.** A typed `FormGroup` of `FormControl`s emits the filter
+  values. The page stores them in a `signal` and derives the visible list with
+  `computed`.
+* **Change detection.** `OnPush` on every component, except the root component.
+* **Routing.** The `:id` route param is bound directly to an `input()` through
+  `withComponentInputBinding()`.
+* **Path aliases:** `@core/*`, `@shared/*`, `@features/*`.
+
+## Angular ↔ Flutter parallels
+
+| Angular | Flutter (the other app in this repo) |
+|---|---|
+| `OrdersService` | Repository (`ProductsRepository` and its datasource) |
+| `HttpClient` | `dio` |
+| `signal` / `Observable` / `toSignal` | Riverpod provider (`ref.watch`) |
+| `LoadState<T>` + `toLoadState()` | `AsyncValue` (`loading` / `error` / `data`) |
+| `computed()` (filtered list) | Derived provider / `select` |
+| Presentational component (`OrderCard`) | Stateless widget |
+| `input()` | Widget constructor parameters |
+| `output()` | Callbacks (`VoidCallback` / `ValueChanged<T>`) |
+| Container component (`OrdersPage`) | Screen that watches providers |
+| `FormControl` | `TextEditingController` |
+| Router + `withComponentInputBinding()` | `go_router` with path parameters |
+| `toSignal` / `outputFromObservable` auto-cleanup | `autoDispose` / `ref.onDispose` |
+| `providedIn: 'root'` | `keepAlive` provider |
+| Test with `HttpTestingController` / mocked service | Test with a fake repository through `overrides` |
+
+In short: the service plays the role of the repository, signals and observables
+play the role of providers, and a presentational component is a stateless widget
+that gets data in and sends events out.
 
 ## Getting started
 
 ### Requirements
 
-* Node.js compatible with the project dependencies
+* Node.js 22 or newer
 * npm 11+
 * Angular CLI 22
 
 ### Setup
 
 ```bash
-# 1. Install dependencies
+# 1. Create your local environment file
+cp .env.template .env      # Windows PowerShell: Copy-Item .env.template .env
+
+# 2. Install dependencies
 npm install
 
-# 2. Start the development server
+# 3. Start the development server
 npm start
 ```
 
-The application uses an environment file to configure the API URL.
-
-Create a local `.env` file from the provided template:
-
-```bash
-# Linux/macOS
-cp .env.template .env
-
-# Windows PowerShell
-Copy-Item .env.template .env
-```
-
-The `.env` file should contain the required values defined in `.env.template`.
+Open `http://localhost:4200/`.
 
 ## Environment configuration
 
-The application generates its TypeScript environment configuration before running or building the application.
-
-The command:
+Unlike the Flutter app, Angular does not read `.env` at runtime: browser bundles
+are public. A small script turns `.env` into a TypeScript file before the app
+runs, builds or tests.
 
 ```bash
 npm run env
 ```
 
-reads `.env` when available, or `.env.template` as a fallback, and generates:
+It reads `.env` when available, or `.env.template` as a fallback, and generates:
 
 ```text
 src/app/core/config/env.generated.ts
 ```
 
-The generated file is ignored by Git and should not be edited manually.
+`npm start`, `npm run build` and `npm test` run it automatically. If you call
+`ng serve`, `ng build` or `ng test` directly, run `npm run env` first.
 
-The main environment variable is:
+The generated file and `.env` are ignored by Git. The main variable is:
 
 ```env
 API_URL=https://dummyjson.com
 ```
 
+Never put secrets here: anything in the bundle is visible to users. The
+DummyJSON API needs no key.
+
 ## Testing
 
-Run the unit tests with:
-
 ```bash
-npm test
+npm test                    # watch mode
+npm test -- --watch=false   # single run, as in CI
 ```
 
-The project includes unit tests for pages, components and services using Angular's configured testing environment.
+17 tests across 9 files:
+
+* **`OrdersService`:** `HttpTestingController` checks the GET request, the
+  mapping to the `carts` array, `/carts/:id` and error propagation.
+* **`OrderCardComponent`:** renders the order data and emits `viewDetail` on click.
+* **`OrdersPageComponent`:** loading, error, one card per order, and filtering by
+  minimum total (service mocked).
+* **`OrderDetailComponent`:** loading, detail and error states.
+* **`DiscountPercentPipe`**, plus smoke tests for other pages and components.
 
 ## Build
-
-To create a production build:
 
 ```bash
 npm run build
 ```
 
-The build process also generates the environment configuration before compiling the application.
-
-The generated application is placed in:
-
-```text
-dist/angular_app/
-```
+The build also generates the environment file first. Output goes to
+`dist/angular_app/`.
 
 ## Continuous integration
 
-A GitHub Actions workflow (`.github/workflows/angular-ci.yml`) runs when changes are pushed or proposed through a pull request affecting the Angular application.
+A GitHub Actions workflow (`.github/workflows/angular-ci.yml`) runs when changes
+that affect the Angular app are pushed or proposed through a pull request.
 
 The workflow:
 

@@ -6,7 +6,7 @@
 
 * [Flutter app](./flutter_app)
 * [Angular app](./angular_app)
-
+* [Respuestas conceptuales (Parte 1)](./RESPUESTAS.md)
 ## Estructura
 
 * `flutter_app/`: app "Mini Catálogo" (Flutter + Riverpod).
