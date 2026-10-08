@@ -1,0 +1,107 @@
+<div class="grid gap-6">
+  <h1 class="text-2xl font-bold text-blue-950">Productos</h1>
+
+  <section
+    aria-label="Filtros de productos"
+    class="grid gap-4 rounded-xl border border-blue-100 bg-white p-5 shadow-sm"
+  >
+    <div class="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
+      <label class="grid gap-1.5 text-sm font-medium text-blue-900 sm:col-span-2 lg:col-span-1">
+        Buscar
+        <span class="relative block">
+          <svg viewBox="0 0 24 24" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-blue-400"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            placeholder="Buscar por nombre o categoría…"
+            [formControl]="search"
+            class="w-full rounded-lg border border-blue-200 bg-blue-50/50 py-2 pl-9 pr-3 text-sm font-normal text-blue-950 placeholder:text-blue-300 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+          />
+        </span>
+      </label>
+
+      <label class="grid gap-1.5 text-sm font-medium text-blue-900">
+        Categoría
+        <select
+          [formControl]="category"
+          class="w-full rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2 text-sm font-normal capitalize text-blue-950 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <option value="">Todas</option>
+          @for (c of categories(); track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="grid gap-1.5 text-sm font-medium text-blue-900">
+        Ordenar por
+        <select
+          [formControl]="sort"
+          class="w-full rounded-lg border border-blue-200 bg-blue-50/50 px-3 py-2 text-sm font-normal text-blue-950 transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <option value="default">Relevancia</option>
+          <option value="price-asc">Precio: menor a mayor</option>
+          <option value="price-desc">Precio: mayor a menor</option>
+          <option value="rating">Mejor valorados</option>
+          <option value="stock">Mayor stock</option>
+        </select>
+      </label>
+
+      <button
+        type="button"
+        (click)="clear()"
+        [disabled]="activeCount() === 0"
+        class="rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white sm:col-span-2 lg:col-span-1"
+      >
+        Limpiar
+        @if (activeCount() > 0) {
+          <span class="ml-1 rounded-full bg-blue-600 px-1.5 py-0.5 text-[11px] text-white">{{ activeCount() }}</span>
+        }
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 items-center gap-3 border-t border-blue-100 pt-4 sm:grid-cols-[1fr_auto]">
+      <label class="flex w-fit cursor-pointer items-center gap-2 text-sm font-medium text-blue-900">
+        <input type="checkbox" [formControl]="inStock"
+               class="size-4 rounded border-blue-300 accent-blue-600 focus-visible:outline-2 focus-visible:outline-blue-500" />
+        Solo con stock
+      </label>
+
+      @let s = state();
+      @if (s.status !== 'loading' && s.status !== 'error') {
+        <p class="text-sm text-blue-500" aria-live="polite">
+          <strong class="font-semibold text-blue-700">{{ filtered().length }}</strong>
+          de {{ s.data.length }} productos
+        </p>
+      }
+    </div>
+  </section>
+
+  @let st = state();
+  @if (st.status === 'loading') {
+    <app-loading-state message="Cargando productos…" />
+  } @else if (st.status === 'error') {
+    <app-error-state [message]="st.message" (retry)="reload()" />
+  } @else {
+    <div class="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      @for (p of filtered(); track p.id) {
+        <app-product-card [product]="p" (viewDetail)="showDetail($event)" />
+      } @empty {
+        <div class="col-span-full grid justify-items-center gap-3 rounded-xl border border-dashed border-blue-200 bg-white p-10 text-center">
+          <svg viewBox="0 0 24 24" class="size-10 text-blue-300" fill="none" stroke="currentColor" stroke-width="1.5"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+          </svg>
+          <p class="font-semibold text-blue-950">Sin resultados</p>
+          <p class="text-sm text-blue-500">Prueba con otros filtros o límpialos para ver todo.</p>
+          <button type="button" (click)="clear()"
+                  class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500">
+            Limpiar filtros
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>

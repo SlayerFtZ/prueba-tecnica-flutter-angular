@@ -1,0 +1,38 @@
+<article
+  class="grid h-full grid-rows-[auto_auto_auto_1fr_auto] justify-items-center gap-3 rounded-xl border border-blue-100 bg-white p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-blue-600/10"
+>
+  <div class="grid size-32 place-items-center rounded-xl bg-blue-50">
+    <img
+      [src]="product().thumbnail"
+      [alt]="product().title"
+      width="120"
+      height="120"
+      loading="lazy"
+      class="size-28 object-contain"
+    />
+  </div>
+
+  <h3 class="line-clamp-2 min-h-10 w-full text-sm font-semibold text-blue-950">
+    {{ product().title }}
+  </h3>
+
+  <small class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium capitalize text-blue-700">
+    {{ product().category }}
+  </small>
+
+  <p class="grid w-full grid-cols-[1fr_auto_auto] items-center content-start gap-x-3 text-xs text-blue-500">
+    <strong class="justify-self-start text-lg font-bold text-blue-700">
+      {{ product().price | currency }}
+    </strong>
+    <span>Stock: {{ product().stock }}</span>
+    <span class="font-medium text-blue-900">⭐ {{ product().rating }}</span>
+  </p>
+
+  <button
+    type="button"
+    (click)="viewDetail.emit(product())"
+    class="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:scale-[0.98]"
+  >
+    Ver detalle
+  </button>
+</article>

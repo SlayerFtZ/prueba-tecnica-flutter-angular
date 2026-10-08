@@ -1,0 +1,72 @@
+<!-- Escritorio: tabla -->
+<div class="hidden overflow-hidden rounded-xl border border-blue-100 bg-white shadow-sm md:block">
+  <table class="w-full text-left text-sm">
+    <caption class="sr-only">Productos del pedido</caption>
+    <thead class="bg-blue-600 text-xs uppercase tracking-wider text-white">
+      <tr>
+        <th scope="col" class="w-20 px-4 py-3"><span class="sr-only">Imagen</span></th>
+        <th scope="col" class="px-4 py-3 font-semibold">Producto</th>
+        <th scope="col" class="px-4 py-3 text-right font-semibold">Cant.</th>
+        <th scope="col" class="px-4 py-3 text-right font-semibold">Precio</th>
+        <th scope="col" class="px-4 py-3 text-right font-semibold">Total c/desc.</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-blue-100">
+      @for (p of products(); track p.id) {
+        <tr class="transition odd:bg-white even:bg-blue-50/40 hover:bg-blue-50">
+          <td class="px-4 py-3">
+            <img
+              [src]="p.thumbnail"
+              [alt]="p.title"
+              width="40"
+              height="40"
+              loading="lazy"
+              class="size-10 rounded-lg border border-blue-100 bg-blue-50 object-cover"
+            />
+          </td>
+          <td class="px-4 py-3 font-medium text-blue-950">{{ p.title }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-blue-900">{{ p.quantity }}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-blue-500">{{ p.price | currency }}</td>
+          <td class="px-4 py-3 text-right font-semibold tabular-nums text-blue-700">
+            {{ p.discountedTotal | currency }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Móvil: tarjetas -->
+<ul class="grid gap-3 md:hidden">
+  @for (p of products(); track p.id) {
+    <li class="grid grid-cols-[56px_1fr] gap-4 rounded-xl border border-blue-100 bg-white p-4 shadow-sm">
+      <img
+        [src]="p.thumbnail"
+        [alt]="p.title"
+        width="56"
+        height="56"
+        loading="lazy"
+        class="size-14 rounded-lg border border-blue-100 bg-blue-50 object-cover"
+      />
+
+      <div class="grid min-w-0 gap-3">
+        <h3 class="truncate text-sm font-semibold text-blue-950">{{ p.title }}</h3>
+
+        <dl class="grid grid-cols-3 gap-2 text-xs">
+          <div class="grid gap-0.5">
+            <dt class="text-blue-400">Cant.</dt>
+            <dd class="font-medium tabular-nums text-blue-900">{{ p.quantity }}</dd>
+          </div>
+          <div class="grid gap-0.5">
+            <dt class="text-blue-400">Precio</dt>
+            <dd class="font-medium tabular-nums text-blue-900">{{ p.price | currency }}</dd>
+          </div>
+          <div class="grid gap-0.5">
+            <dt class="text-blue-400">Total c/desc.</dt>
+            <dd class="font-bold tabular-nums text-blue-700">{{ p.discountedTotal | currency }}</dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+  }
+</ul>

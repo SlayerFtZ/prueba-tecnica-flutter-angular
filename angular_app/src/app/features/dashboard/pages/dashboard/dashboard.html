@@ -1,0 +1,15 @@
+<h1>Dashboard</h1>
+
+@let s = state();
+@if (s.status === 'loading') {
+  <app-loading-state message="Cargando resumen…" />
+} @else if (s.status === 'error') {
+  <p role="alert">{{ s.message }}</p>
+} @else {
+  <div class="grid">
+    <app-stat-card label="Pedidos" [value]="s.data.orders" />
+    <app-stat-card label="Ingresos" [value]="money(s.data.revenue)" />
+    <app-stat-card label="Ticket promedio" [value]="money(s.data.avgTicket)" />
+    <app-stat-card label="Productos" [value]="s.data.products" />
+  </div>
+}
