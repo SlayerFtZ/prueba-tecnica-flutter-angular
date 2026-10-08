@@ -4,15 +4,25 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
   selector: 'app-navbar',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <header class="navbar">
-      <button type="button" aria-label="Alternar menú" (click)="toggleMenu.emit()">☰</button>
-      <strong>Admin Panel</strong>
+    <header class="sticky top-0 z-20 flex h-14 items-center gap-3 bg-blue-600 px-4 text-white shadow-md shadow-blue-900/10">
+      <button
+        type="button"
+        aria-label="Alternar menú"
+        (click)="toggleMenu.emit()"
+        class="grid size-9 place-items-center rounded-lg transition hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white"
+      >
+        <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <div class="flex items-center gap-2">
+
+        <strong class="text-sm font-semibold tracking-wide">Dashboard</strong>
+      </div>
+
+
     </header>
-  `,
-  styles: `
-    .navbar { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem;
-              background: #1f2937; color: #fff; }
-    button { background: none; border: 0; color: inherit; font-size: 1.25rem; cursor: pointer; }
   `,
 })
 export class NavbarComponent {
