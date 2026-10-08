@@ -1,59 +1,165 @@
-# AngularApp
+# angular_app
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.1.
+Angular application for managing orders, products and dashboard information.
 
-## Development server
+![CI](https://github.com/SlayerFtZ/prueba-tecnica-flutter-angular/actions/workflows/angular-ci.yml/badge.svg)
 
-To start a local development server, run:
+## Features
 
-```bash
-ng serve
+* Dashboard with order summary information
+* Browse products
+* Browse orders
+* Order filtering
+* Order detail view
+* Order items visualization
+* Unit tests for pages, components and services
+* Environment configuration through `.env`
+
+## Tech stack
+
+* **Framework:** Angular 22
+* **Language:** TypeScript
+* **Styling:** CSS
+* **Testing:** Vitest
+* **UI components:** SweetAlert2
+* **Build tooling:** Angular CLI
+* **Environment:** `.env` with a generated TypeScript configuration file
+* **CI:** GitHub Actions
+
+## Architecture
+
+Feature-first architecture. Each feature groups its pages, components, models, services and routes:
+
+```text
+src/app/
+
+├── core/
+│   └── config/              # environment and application configuration
+│
+├── features/
+│   ├── dashboard/
+│   │   ├── pages/           # dashboard views
+│   │   └── dashboard-routes.ts
+│   │
+│   ├── orders/
+│   │   ├── components/      # order cards, filters and items
+│   │   ├── models/          # order models
+│   │   ├── pages/           # orders list and order detail
+│   │   ├── services/        # orders API service
+│   │   └── orders.routes.ts
+│   │
+│   └── products/
+│       ├── components/      # product components
+│       ├── models/          # product models
+│       ├── pages/           # products list
+│       ├── services/        # products API service
+│       └── products-routes.ts
+│
+└── shared/                  # shared application components
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Each feature is organized according to its responsibility:
 
-## Code scaffolding
+* **pages:** main views of each feature, such as the dashboard, orders list, order detail and products list.
+* **components:** reusable UI components specific to a feature.
+* **models:** TypeScript models used to represent application data.
+* **services:** services responsible for communication with the API and feature-related data logic.
+* **routes:** route definitions for each feature.
+* **spec.ts:** unit tests associated with pages, components and services.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+This structure keeps each feature encapsulated and makes the application easier to maintain and extend as it grows.
 
-```bash
-ng generate component component-name
-```
+## Getting started
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Requirements
 
-```bash
-ng generate --help
-```
+* Node.js compatible with the project dependencies
+* npm 11+
+* Angular CLI 22
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Setup
 
 ```bash
-ng test
+# 1. Install dependencies
+npm install
+
+# 2. Start the development server
+npm start
 ```
 
-## Running end-to-end tests
+The application uses an environment file to configure the API URL.
 
-For end-to-end (e2e) testing, run:
+Create a local `.env` file from the provided template:
 
 ```bash
-ng e2e
+# Linux/macOS
+cp .env.template .env
+
+# Windows PowerShell
+Copy-Item .env.template .env
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The `.env` file should contain the required values defined in `.env.template`.
 
-## Additional Resources
+## Environment configuration
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The application generates its TypeScript environment configuration before running or building the application.
+
+The command:
+
+```bash
+npm run env
+```
+
+reads `.env` when available, or `.env.template` as a fallback, and generates:
+
+```text
+src/app/core/config/env.generated.ts
+```
+
+The generated file is ignored by Git and should not be edited manually.
+
+The main environment variable is:
+
+```env
+API_URL=https://dummyjson.com
+```
+
+## Testing
+
+Run the unit tests with:
+
+```bash
+npm test
+```
+
+The project includes unit tests for pages, components and services using Angular's configured testing environment.
+
+## Build
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+The build process also generates the environment configuration before compiling the application.
+
+The generated application is placed in:
+
+```text
+dist/angular_app/
+```
+
+## Continuous integration
+
+A GitHub Actions workflow (`.github/workflows/angular-ci.yml`) runs when changes are pushed or proposed through a pull request affecting the Angular application.
+
+The workflow:
+
+1. Checks out the repository.
+2. Configures Node.js 22.
+3. Installs dependencies with `npm ci`.
+4. Creates `.env` from `.env.template`.
+5. Runs the unit tests.
+6. Builds the Angular application.

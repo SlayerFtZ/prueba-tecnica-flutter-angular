@@ -4,6 +4,7 @@
 *.env
 .env.*
 !.env.template
+.env.template
 # Compiled output
 /dist
 /tmp
@@ -46,3 +47,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+.env
+src/app/core/config/env.generated.ts

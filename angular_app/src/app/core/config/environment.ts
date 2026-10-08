@@ -1,6 +1,7 @@
+import { ENV } from './env.generated';
+
 export const environment = {
-  production: false,
-  apiUrl: 'https://dummyjson.com',
+  apiUrl: ENV.apiUrl,
   endpoints: {
     carts: '/carts',
     products: '/products',
